@@ -1,5 +1,3 @@
-
-
 name: Sync upstream
 
 on:
@@ -16,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -25,14 +23,15 @@ jobs:
           git remote add upstream https://github.com/water649/MioWatery.git
           git fetch upstream main
 
-      - name: Merge upstream
-        run: git merge --no-edit upstream/main
+      - name: Create sync branch
+        run: |
+          git checkout -b upstream-sync
+          git merge --no-commit --no-ff upstream/main
 
       - name: Create update PR
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@v7
         with:
           branch: upstream-sync
           base: main
           title: "Update from upstream"
-          body: "Automatic upstream update. Review before merging."
-.
+          body: "Review upstream changes before merging."
