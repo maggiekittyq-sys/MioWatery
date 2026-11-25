@@ -7,31 +7,30 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch upstream
         run: |
           git remote add upstream https://github.com/water649/MioWatery.git
           git fetch upstream main
 
-      - name: Create sync branch
+      - name: Configure Git
         run: |
-          git checkout -b upstream-sync
-          git merge --no-commit --no-ff upstream/main
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Create update PR
-        uses: peter-evans/create-pull-request@v7
-        with:
-          branch: upstream-sync
-          base: main
-          title: "Update from upstream"
-          body: "Review upstream changes before merging."
+      - name: Merge upstream
+        run: git merge --no-edit upstream/main
+
+      - name: Push updates
+        run: git push origin HEAD:main
